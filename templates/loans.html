@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Loan Management{% endblock %}
+
+{% block content %}
+<div class="space-y-6">
+
+    <!-- FILTERS -->
+    <div class="flex gap-4 border-b border-gray-200 pb-4">
+        <a href="/loans?filter=all" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ 'bg-indigo-600 text-white shadow-md' if filter == 'all' else 'bg-white text-gray-600 hover:bg-gray-50' }}">
+            All History
+        </a>
+        <a href="/loans?filter=active" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ 'bg-emerald-600 text-white shadow-md' if filter == 'active' else 'bg-white text-gray-600 hover:bg-gray-50' }}">
+            Active Loans
+        </a>
+        <a href="/loans?filter=overdue" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ 'bg-red-600 text-white shadow-md' if filter == 'overdue' else 'bg-white text-gray-600 hover:bg-gray-50' }}">
+            Overdue Only
+        </a>
+    </div>
+
+    <!-- LOANS TABLE -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead class="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+                    <tr>
+                        <th class="px-6 py-4">Loan ID</th>
+                        <th class="px-6 py-4">Book Title</th>
+                        <th class="px-6 py-4">Borrower</th>
+                        <th class="px-6 py-4">Issue Date</th>
+                        <th class="px-6 py-4">Due Date</th>
+                        <th class="px-6 py-4">Status</th>
+                        <th class="px-6 py-4">Action</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100 text-sm">
+                    {% for loan in loans %}
+                    <tr class="hover:bg-gray-50 transition">
+                        <!-- BIG BOLD LOAN ID -->
+                        <td class="px-6 py-4 font-mono font-bold text-indigo-600">#{{ loan.loan_id }}</td>
+                        
+                        <td class="px-6 py-4 font-medium text-gray-800">{{ loan.title }}</td>
+                        <td class="px-6 py-4 text-gray-600">
+                            <div class="flex items-center gap-2">
+                                <div class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold">
+                                    {{ loan.borrower[:1] }}
+                                </div>
+                                {{ loan.borrower }}
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-gray-500">{{ loan.issue_date }}</td>
+                        <td class="px-6 py-4 {{ 'text-red-600 font-bold' if loan.status == 'Overdue' else 'text-gray-500' }}">
+                            {{ loan.due_date }}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if loan.status == 'Issued' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active
+                                </span>
+                            {% elif loan.status == 'Overdue' %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Overdue
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                                    Returned
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4">
+                            {% if loan.status != 'Returned' %}
+                            <!-- Quick Return Button -->
+                            <form action="/return_book" method="POST" class="inline">
+                                <input type="hidden" name="loan_id" value="{{ loan.loan_id }}">
+                                <button class="text-xs bg-gray-900 text-white px-3 py-1.5 rounded hover:bg-black transition">
+                                    Return
+                                </button>
+                            </form>
+                            {% else %}
+                                <span class="text-xs text-gray-400">Closed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-6 py-12 text-center text-gray-400 italic">
+                            No loans found matching this filter.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

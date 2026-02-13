@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LMS | Professional</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans">
+
+    <div class="flex h-screen overflow-hidden">
+        
+        <!-- SIDEBAR -->
+        <aside class="w-64 bg-slate-900 text-white flex flex-col shadow-2xl">
+            <div class="h-16 flex items-center justify-center border-b border-slate-700">
+                <h1 class="text-xl font-bold tracking-wider">LIBRA<span class="text-indigo-400">SYS</span></h1>
+            </div>
+            
+            <nav class="flex-1 px-4 py-6 space-y-2">
+                <a href="/" class="{{ 'bg-indigo-600 shadow-lg text-white' if page == 'dashboard' else 'text-slate-400 hover:bg-slate-800 hover:text-white' }} flex items-center px-4 py-3 rounded-lg transition-all">
+                    <i class="fa-solid fa-gauge w-6"></i> <span class="font-medium">Dashboard</span>
+                </a>
+                
+                <!-- NEW LOANS LINK -->
+                <a href="/loans" class="{{ 'bg-indigo-600 shadow-lg text-white' if page == 'loans' else 'text-slate-400 hover:bg-slate-800 hover:text-white' }} flex items-center px-4 py-3 rounded-lg transition-all">
+                    <i class="fa-solid fa-clock-rotate-left w-6"></i> <span class="font-medium">Loans</span>
+                </a>
+
+                <a href="/inventory" class="{{ 'bg-indigo-600 shadow-lg text-white' if page == 'inventory' else 'text-slate-400 hover:bg-slate-800 hover:text-white' }} flex items-center px-4 py-3 rounded-lg transition-all">
+                    <i class="fa-solid fa-book w-6"></i> <span class="font-medium">Inventory</span>
+                </a>
+                <a href="/members" class="{{ 'bg-indigo-600 shadow-lg text-white' if page == 'members' else 'text-slate-400 hover:bg-slate-800 hover:text-white' }} flex items-center px-4 py-3 rounded-lg transition-all">
+                    <i class="fa-solid fa-users w-6"></i> <span class="font-medium">Members</span>
+                </a>
+            </nav>
+
+            <div class="p-4 border-t border-slate-700">
+                <div class="flex items-center gap-3">
+                    <img src="https://ui-avatars.com/api/?name=Admin+User&background=6366f1&color=fff" class="w-10 h-10 rounded-full">
+                    <div><p class="text-sm font-medium">System Admin</p></div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT WRAPPER -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- HEADER -->
+            <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 shadow-sm z-10">
+                <h2 class="text-lg font-semibold text-gray-700">{% block title %}Overview{% endblock %}</h2>
+                <div class="flex items-center gap-4">
+                    {% block actions %}{% endblock %}
+                </div>
+            </header>
+
+            <!-- DYNAMIC CONTENT -->
+            <div class="flex-1 overflow-y-auto p-8 scroller">
+                {% block content %}{% endblock %}
+                <footer class="mt-12 mb-4 text-center text-xs text-gray-400">&copy; 2025 Library Management System.</footer>
+            </div>
+        </main>
+    </div>
+
+    <!-- Hidden Flash Messages Container -->
+    <div id="flash-messages" class="hidden">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div data-message="{{ message }}" data-category="{{ 'error' if category == 'error' else 'success' }}"></div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <!-- GLOBAL SCRIPTS -->
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Read messages from the hidden HTML container
+            const flashContainer = document.getElementById('flash-messages');
+            if (flashContainer) {
+                const messages = flashContainer.querySelectorAll('div');
+                messages.forEach(msg => {
+                    const text = msg.getAttribute('data-message');
+                    const category = msg.getAttribute('data-category');
+                    if (text && typeof showToast === 'function') {
+                        showToast(text, category);
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
